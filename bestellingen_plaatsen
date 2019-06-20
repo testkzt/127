@@ -1,0 +1,66 @@
+<?php
+$conn = new PDO('mysql:dbname=kt_final;host=127.0.0.1', 'A', '1234', [
+	PDO::ATTR_ERRMODE=> PDO::ERRMODE_EXCEPTION
+]);
+?>
+<?php
+$bestelling_ID = $gerechtid = $aantal = $tafel = $tijd = $bestellingid = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $gerechtid = filter_input(INPUT_POST, 'gerechtid', FILTER_SANITIZE_NUMBER_FLOAT);
+    $aantal = filter_input(INPUT_POST, 'aantal', FILTER_SANITIZE_NUMBER_FLOAT);
+    $stmt = $conn->prepare('INSERT INTO bestellingen (gerechtid, aantal, tafel, tijd) VALUES (:gerechtid, :aantal, :tafel, :tijd');
+    $stmt->execute([
+        ':gerechtid' => $gerechtid,
+        ':aantal' => $aantal,
+        ':tafel' => $tafel,
+        ':tijd' => $tijd
+    ]);
+}
+// $sql = 'SELECT tafel, tijd, reservering_id as data
+//         FROM reservering';
+// $stmt = $conn->prepare($sql);
+// $stmt->execute();
+// $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$sql = 'SELECT gerecht_id as gerecht
+        FROM gerechten';
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$gerechten = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$data = $stmt->fetch(PDO::FETCH_ASSOC);
+?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Gerechten</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    
+</head>
+<body>
+	<form method="post">
+		<label>
+            reservering_id:
+            <input class="reservering_id" name="reservering_id"  value="<?php echo $data['reservering_id']?>">
+        </label>
+        <label>
+            tijd:
+            <input class="tijd" name="tijd"  value="<?php echo $data['tijd']?>">
+        </label>
+        <label>
+            tafel:
+            <input class="tafel" name="tafel"  value="<?php echo $data['tafel']?>">
+        </label>
+        <label>
+        gerecht:
+        <select name="data">
+<?php foreach ($gerechten as $gerecht) {
+    echo '<option value="' . $gerecht['gerecht_id'] .'</option>' . PHP_EOL;
+} ?>
+        </select>
+    </label>
+    <label>
+        aantal:
+        <input class="aantal" name="aantal">
+    </label>
+        <button type="submit">INVOEREN</button>
+    </form>
+</body>
+</html>
